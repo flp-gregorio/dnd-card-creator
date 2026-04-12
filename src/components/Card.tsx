@@ -97,9 +97,8 @@ export function Card({ data, theme }: Props) {
           <div 
             className="dnd-set" 
             style={{ borderColor: theme.border, background: theme.setBg, color: theme.muted }}
-          >
-            {data.setNote}
-          </div>
+            dangerouslySetInnerHTML={{ __html: data.setNote }}
+          />
         )}
       </div>
     </div>

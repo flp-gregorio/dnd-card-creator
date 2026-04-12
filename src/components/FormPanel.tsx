@@ -1,7 +1,8 @@
 import type { CardData } from '../types';
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { AbilitiesForm } from './AbilitiesForm';
 import { ThemeSelector } from './ThemeSelector';
+import { themes } from '../themes';
 
 interface Props {
   data: CardData;
@@ -12,8 +13,54 @@ interface Props {
 }
 
 export function FormPanel({ data, onChange, currentThemeIndex, onSelectTheme, onClose }: Props) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const setField = (field: keyof CardData, value: any) => {
     onChange({ ...data, [field]: value });
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        
+        if (json.schema === 'card-generator-v1') {
+          const stdTypes = ['Longsword', 'Shortsword', 'Greatsword', 'Dagger', 'Handaxe', 'Greataxe', 'Rapier', 'Mace', 'Staff', 'Wondrous Item', 'Ring', 'Amulet', 'Shield', 'Armor'];
+          const isStdType = stdTypes.includes(json.type);
+          
+          const newData: CardData = {
+            name: json.name || '',
+            type: isStdType ? json.type : 'custom',
+            customType: isStdType ? '' : (json.type || ''),
+            rarity: json.rarity || 'Common',
+            attune: !!json.requires_attunement,
+            dmg: json.stats?.damage || '',
+            props: json.stats?.properties || '',
+            req: json.stats?.requirement || '',
+            flavor: json.flavor || '',
+            abilities: json.abilities || [],
+            setNote: json.set_note || ''
+          };
+          onChange(newData);
+
+          if (json.theme) {
+            const tIndex = themes.findIndex(t => t.name.toLowerCase() === json.theme.toLowerCase());
+            if (tIndex >= 0) onSelectTheme(tIndex);
+          }
+        } else {
+          alert("Invalid JSON format. Expected schema 'card-generator-v1'");
+        }
+      } catch (err) {
+        alert("Failed to parse JSON file.");
+      }
+    };
+    reader.readAsText(file);
+    
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const SectionHead = ({ children }: { children: ReactNode }) => (
@@ -33,8 +80,18 @@ export function FormPanel({ data, onChange, currentThemeIndex, onSelectTheme, on
       {/* Drawer Header */}
       <div className="flex items-center justify-between p-6 pb-4 border-b border-[var(--border)] shrink-0">
         <div>
-          <h2 className="text-base font-semibold m-0">Card Editor</h2>
-          <span className="text-[11px] text-[var(--text3)]">Update details automatically</span>
+          <div className="flex items-center gap-3">
+            <h2 className="text-base font-semibold m-0">Card Editor</h2>
+            <button 
+              onClick={() => fileInputRef.current?.click()} 
+              className="text-[10px] font-medium uppercase tracking-[0.05em] px-2 py-1 rounded bg-[var(--surface2)] hover:bg-[var(--border)] transition-colors text-[var(--text2)] cursor-pointer border border-[var(--border2)] shadow-sm"
+              title="Import from JSON"
+            >
+              Import JSON
+            </button>
+            <input type="file" accept=".json" className="hidden" ref={fileInputRef} onChange={handleImport} />
+          </div>
+          <span className="text-[11px] text-[var(--text3)] block mt-1">Update details automatically</span>
         </div>
         {onClose && (
           <button 
