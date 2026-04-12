@@ -14,7 +14,7 @@ export function ThemeSelector({ currentThemeIndex, onSelectTheme }: Props) {
         return (
           <div
             key={t.name}
-            className={`h-8 rounded-lg cursor-pointer border-2 transition-all relative group
+            className={`h-8 rounded-lg cursor-pointer border-2 transition-all relative group hover:z-10
               ${isSelected ? 'border-[var(--text)]' : 'border-transparent hover:scale-105'}`}
             style={{ background: t.swatch }}
             title={t.name}

@@ -8,9 +8,10 @@ interface Props {
   onChange: (data: CardData) => void;
   currentThemeIndex: number;
   onSelectTheme: (i: number) => void;
+  onClose?: () => void;
 }
 
-export function FormPanel({ data, onChange, currentThemeIndex, onSelectTheme }: Props) {
+export function FormPanel({ data, onChange, currentThemeIndex, onSelectTheme, onClose }: Props) {
   const setField = (field: keyof CardData, value: any) => {
     onChange({ ...data, [field]: value });
   };
@@ -28,8 +29,28 @@ export function FormPanel({ data, onChange, currentThemeIndex, onSelectTheme }: 
   const inputClass = "w-full px-2.5 py-1.5 text-[13px] border border-[var(--border2)] rounded-lg bg-[var(--surface2)] text-[var(--text)] outline-none focus:border-gray-400 transition-colors";
 
   return (
-    <div className="bg-[var(--surface)] border-r border-[var(--border)] overflow-y-auto p-6 h-full">
-      <SectionHead>Identity</SectionHead>
+    <div className="bg-[var(--surface)] border-r border-[var(--border)] h-full flex flex-col overflow-hidden">
+      {/* Drawer Header */}
+      <div className="flex items-center justify-between p-6 pb-4 border-b border-[var(--border)] shrink-0">
+        <div>
+          <h2 className="text-base font-semibold m-0">Card Editor</h2>
+          <span className="text-[11px] text-[var(--text3)]">Update details automatically</span>
+        </div>
+        {onClose && (
+          <button 
+            onClick={onClose}
+            className="p-2 -mr-2 rounded-full hover:bg-[var(--surface2)] text-[var(--text2)] transition-colors cursor-pointer"
+            title="Close Editor"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-6 pt-2">
+        <SectionHead>Identity</SectionHead>
       
       <div className="mb-2.5">
         <Label>Item name</Label>
@@ -116,6 +137,7 @@ export function FormPanel({ data, onChange, currentThemeIndex, onSelectTheme }: 
 
       <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-[var(--text3)] mt-5 mb-6 pb-1 border-b border-[var(--border)]">Theme</div>
       <ThemeSelector currentThemeIndex={currentThemeIndex} onSelectTheme={onSelectTheme} />
+      </div>
     </div>
   );
 }

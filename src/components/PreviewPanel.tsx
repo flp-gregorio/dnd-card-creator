@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useRef, useEffect, type ReactNode } from 'react';
 import html2canvas from 'html2canvas';
 
 interface Props {
@@ -7,8 +7,50 @@ interface Props {
 }
 
 export function PreviewPanel({ children, cardName }: Props) {
-  const [scale, setScale] = useState(100);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cardMeasureRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
   const [exporting, setExporting] = useState(false);
+
+  useEffect(() => {
+    const calculateScale = () => {
+      if (!containerRef.current || !cardMeasureRef.current) return;
+      
+      const pw = containerRef.current.clientWidth;
+      const ph = containerRef.current.clientHeight;
+      const cw = cardMeasureRef.current.offsetWidth;
+      const ch = cardMeasureRef.current.offsetHeight;
+      
+      if (cw === 0 || ch === 0) return;
+      
+      const padding = 64; 
+      const availableW = pw - padding;
+      const availableH = ph - padding;
+      
+      const scaleW = availableW / cw;
+      const scaleH = availableH / ch;
+      
+      let newScale = Math.min(scaleW, scaleH);
+      newScale = Math.max(0.3, Math.min(newScale, 2.5)); // Cap scale
+      
+      setScale(newScale);
+    };
+
+    const observer = new ResizeObserver(() => {
+      calculateScale();
+    });
+
+    if (containerRef.current) observer.observe(containerRef.current);
+    if (cardMeasureRef.current) observer.observe(cardMeasureRef.current);
+    
+    // Fallback recalculation on window resize
+    window.addEventListener('resize', calculateScale);
+    
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', calculateScale);
+    };
+  }, [children]);
 
   const exportPng = async () => {
     const card = document.getElementById('the-card');
@@ -17,12 +59,19 @@ export function PreviewPanel({ children, cardName }: Props) {
     setExporting(true);
 
     try {
+      // Temporarily remove scaling for crisp export
+      const originalTransform = card.parentElement!.style.transform;
+      card.parentElement!.style.transform = 'none';
+      
       const canvas = await html2canvas(card, {
         scale: 3,
         useCORS: true,
         backgroundColor: null,
         logging: false,
       });
+      
+      // Restore scale
+      card.parentElement!.style.transform = originalTransform;
 
       const name = (cardName || 'card').toLowerCase().replace(/\s+/g, '-');
       const link = document.createElement('a');
@@ -37,34 +86,33 @@ export function PreviewPanel({ children, cardName }: Props) {
   };
 
   return (
-    <div className="overflow-y-auto p-8 flex flex-col items-center gap-6 h-full">
-      <div className="text-[11px] uppercase tracking-[0.1em] text-[var(--text3)] self-start">
-        Preview
-      </div>
-      
-      <div className="flex items-center gap-2.5 self-start">
-        <label className="text-xs text-[var(--text2)]">Scale</label>
-        <input 
-          type="range" 
-          min="50" 
-          max="150" 
-          value={scale} 
-          step="5" 
-          className="w-24"
-          onChange={(e) => setScale(Number(e.target.value))} 
-        />
-        <span className="text-xs text-[var(--text2)] min-w-[30px]">{scale}%</span>
-      </div>
-
-      <div style={{ transform: `scale(${scale / 100})`, transformOrigin: 'top center' }}>
+    <div 
+      ref={containerRef} 
+      className="w-full h-full overflow-hidden flex items-center justify-center relative bg-[var(--surface2)]"
+      style={{
+        backgroundImage: 'radial-gradient(var(--border) 1.5px, transparent 1.5px)',
+        backgroundSize: '24px 24px'
+      }}
+    >
+      <div 
+        ref={cardMeasureRef}
+        style={{ 
+          transform: `scale(${scale})`, 
+          transformOrigin: 'center center', 
+          transition: 'transform 0.15s ease-out' 
+        }}
+      >
         {children}
       </div>
 
       <button 
         onClick={exportPng} 
         disabled={exporting}
-        className="px-5 py-2 text-[13px] font-medium cursor-pointer border border-[var(--border2)] rounded-lg bg-[var(--surface)] text-[var(--text)] transition-colors hover:bg-[var(--surface2)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed mt-auto"
+        className="absolute bottom-8 right-8 px-6 py-3 text-[14px] font-semibold shadow-lg border border-[var(--border2)] rounded-full bg-[var(--surface)] text-[var(--text)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2 z-10"
       >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+        </svg>
         {exporting ? 'Exporting...' : 'Export PNG'}
       </button>
     </div>

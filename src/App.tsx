@@ -25,25 +25,50 @@ const DEFAULT_DATA: CardData = {
 function App() {
   const [data, setData] = useState<CardData>(DEFAULT_DATA);
   const [themeIndex, setThemeIndex] = useState(0);
+  const [isFormOpen, setIsFormOpen] = useState(true);
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] text-sm flex flex-col">
-      <header className="px-8 py-5 border-b border-[var(--border)] bg-[var(--surface)] flex items-center gap-4 shrink-0">
-        <h1 className="text-base font-medium m-0">D&D Item Card Generator</h1>
-        <span className="text-xs text-[var(--text3)]">Live preview — export to PNG when ready</span>
-      </header>
-      
-      <div className="flex-1 grid grid-cols-[380px_1fr] h-[calc(100vh-65px)]">
+    <div className="h-screen max-h-screen bg-[var(--bg)] text-[var(--text)] text-sm flex overflow-hidden relative w-full">
+      {/* Floating Edit Button */}
+      {!isFormOpen && (
+        <button
+          onClick={() => setIsFormOpen(true)}
+          className="absolute top-6 left-6 z-40 px-5 py-3 rounded-full bg-[var(--surface)] shadow-[0_4px_16px_rgba(0,0,0,0.1)] border border-[var(--border)] text-[var(--text)] hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-2 font-medium"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+          Edit Card
+        </button>
+      )}
+
+      {/* Left Sidebar Drawer / 50% Pane on Desktop */}
+      <div 
+        className={`absolute lg:relative top-0 left-0 h-full w-[380px] lg:w-1/2 max-w-[90vw] shrink-0 z-50 bg-[var(--surface)] shadow-[4px_0_24px_rgba(0,0,0,0.1)] lg:shadow-none transition-all duration-300 ease-in-out border-r border-[var(--border)] flex flex-col ${isFormOpen ? 'translate-x-0 lg:ml-0' : '-translate-x-full lg:-ml-[50%] lg:translate-x-0'}`}
+      >
         <FormPanel 
           data={data} 
           onChange={setData} 
           currentThemeIndex={themeIndex}
           onSelectTheme={setThemeIndex}
+          onClose={() => setIsFormOpen(false)}
         />
+      </div>
+
+      {/* Main Preview Area */}
+      <div className="flex-1 min-w-0 w-full h-full relative z-0 flex bg-[var(--surface2)]">
         <PreviewPanel cardName={data.name}>
           <Card data={data} theme={themes[themeIndex]} />
         </PreviewPanel>
       </div>
+
+      {/* Mobile Backdrop */}
+      {isFormOpen && (
+        <div 
+          className="lg:hidden absolute inset-0 bg-black/40 z-40 transition-opacity" 
+          onClick={() => setIsFormOpen(false)}
+        />
+      )}
     </div>
   );
 }
