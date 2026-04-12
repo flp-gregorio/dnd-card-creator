@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@theme {
+  --font-fell: "IM Fell English", Georgia, serif;
+  --font-fell-sc: "IM Fell English SC", Georgia, serif;
+}
+
+:root {
+  --bg: #f8f7f5;
+  --surface: #ffffff;
+  --surface2: #f1f0ee;
+  --border: rgba(0,0,0,0.12);
+  --border2: rgba(0,0,0,0.22);
+  --text: #1a1a1a;
+  --text2: #555;
+  --text3: #888;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111;
+    --surface: #1c1c1e;
+    --surface2: #2a2a2c;
+    --border: rgba(255,255,255,0.1);
+    --border2: rgba(255,255,255,0.2);
+    --text: #f0f0f0;
+    --text2: #aaa;
+    --text3: #666;
+  }
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Card Specifics */
+.dnd-card {
+  font-family: var(--font-fell);
+  position: relative;
+  width: 380px;
+}
+
+.dnd-card-inner {
+  padding: 1.5rem 1.5rem 1.25rem;
+  border: 1px solid;
+  border-radius: 4px;
+  position: relative;
+}
+
+.dnd-corner { position: absolute; width: 18px; height: 18px; }
+.dnd-corner.tl { top: 6px; left: 6px; border-top: 1px solid; border-left: 1px solid; }
+.dnd-corner.tr { top: 6px; right: 6px; border-top: 1px solid; border-right: 1px solid; }
+.dnd-corner.bl { bottom: 6px; left: 6px; border-bottom: 1px solid; border-left: 1px solid; }
+.dnd-corner.br { bottom: 6px; right: 6px; border-bottom: 1px solid; border-right: 1px solid; }
+
+.dnd-name {
+  font-family: var(--font-fell-sc);
+  font-size: 22px;
+  font-weight: normal;
+  letter-spacing: 0.04em;
+  margin: 0 0 2px;
+  line-height: 1.2;
+}
+
+.dnd-type {
+  font-size: 12px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin: 0 0 0;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dnd-pip { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.dnd-divider { height: 1px; margin: 10px 0; border: none; }
+.dnd-stats { display: flex; flex-wrap: wrap; gap: 1rem; margin: 8px 0; }
+.dnd-stat-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; display: block; }
+.dnd-stat-val { font-size: 13px; display: block; }
+.dnd-flavor {
+  font-style: italic;
+  font-size: 12.5px;
+  line-height: 1.6;
+  margin: 9px 0;
+  padding: 7px 10px;
+  border-left: 2px solid;
+}
+.dnd-abilities { list-style: none; padding: 0; margin: 9px 0 0; display: flex; flex-direction: column; gap: 10px; }
+.dnd-abilities li { font-size: 13px; line-height: 1.55; padding-left: 15px; position: relative; }
+.dnd-abilities li::before { content: '◆'; position: absolute; left: 0; font-size: 7px; top: 5px; }
+.dnd-ability-name { font-family: var(--font-fell-sc); letter-spacing: 0.02em; }
+.dnd-set {
+  margin-top: 12px;
+  padding: 8px 10px;
+  border-radius: 2px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  text-align: center;
+  font-style: italic;
+  border: 1px dashed;
+}
