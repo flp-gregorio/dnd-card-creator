@@ -4,7 +4,7 @@ Hey! This is a simple, quick application I threw together to easily generate dec
 
 You just punch in the stats, flavor text, and abilities, pick a visual theme that fits the vibe, and it instantly spits out a clean PNG image for your players. 
 
-Built quickly with React, Vite, and Tailwind CSS v4.
+Built with React, Vite, and Tailwind CSS v4.
 
 ## How to run it
 
