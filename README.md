@@ -2,17 +2,18 @@
 
 🪄 **[Try the Live Generator Here!](https://flp-gregorio.github.io/dnd-card-creator/)**
 
-Hey! This is a simple, quick application I threw together to easily generate decent-looking custom item cards for D&D 5e (or any tabletop RPG). 
+A simple tool to generate custom item cards for D&D 5e or any tabletop RPG. Fill in the stats, flavor text, and abilities, pick a theme, and export a clean PNG for your players.
 
-You just punch in the stats, flavor text, and abilities, pick a visual theme that fits the vibe, and it instantly spits out a clean PNG image for your players. 
+Built with React, Vite, and Tailwind CSS v4.
 
-Built quickly with React, Vite, and Tailwind CSS v4.
+<p align="center" >
+  <img src="https://i.imgur.com/XaGjY80.png" width="300" />
+  <img src="https://i.imgur.com/8abuM26.png" width="300" />
+</p>
 
-## How to run it locally
+## Running locally
 
 1. `npm install`
 2. `npm run dev`
 3. Edit the fields on the left, see the live preview on the right.
-4. Hit "Export PNG" when you're happy with your design.
-
-That's it, enjoy the loot!
+4. Hit **Export PNG** when you're happy with your design.
